@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: jobengine-postgres
+    environment:
+      POSTGRES_DB: jobengine
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

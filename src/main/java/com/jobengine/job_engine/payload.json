@@ -1,0 +1,6 @@
+{
+  "type": "GENERATE_STATEMENT",
+  "payload": "{\"userId\": \"user_456\", \"month\": \"2026-05\"}",
+  "priority": "HIGH",
+  "idempotencyKey": "stmt-user456-may2026"
+}
