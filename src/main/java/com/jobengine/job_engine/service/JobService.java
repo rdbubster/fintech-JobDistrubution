@@ -59,4 +59,23 @@ return existing.get();
                 .orElseThrow(()->new RuntimeException("Job record not found: "+ id));
    }
 
+   @Transactional
+    public Job cancel(UUID id){
+
+        Job job=findById(id);
+
+        if(job.getStatus() != JobStatus.PENDING){
+            throw new IllegalStateException(
+                    "Cannot cancel job in status: "+ job.getStatus() +
+                            ". Only PENDING jobs can be cancelled safely."
+            );
+        }
+
+        job.setStatus(JobStatus.CANCELLED);
+        job.setUpdatedAt(Instant.now());
+
+        log.info("Job {} successfully cancelled",id);
+        return jobRepository.save(job);
+   }
+
 }

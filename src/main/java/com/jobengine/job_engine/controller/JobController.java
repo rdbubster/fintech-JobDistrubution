@@ -27,4 +27,13 @@ public class JobController {
     public ResponseEntity<Job> getById(@PathVariable UUID id){
         return ResponseEntity.ok(jobService.findById(id));
     }
+
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<Job> cancel(@PathVariable UUID id){
+        return ResponseEntity.ok(jobService.cancel(id));
+      //  return ResponseEntity.ok(cancel(id));
+    }
+
+
 }
