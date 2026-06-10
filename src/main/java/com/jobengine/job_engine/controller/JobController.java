@@ -23,6 +23,15 @@ public class JobController {
         return ResponseEntity.ok(jobService.submit(request));
 
     }
+
+    // We use @PostMapping because this action triggers a state change mutation reset sequence
+    @PostMapping("/{id}/retry")
+    public ResponseEntity<Job> retry(@PathVariable UUID id) {
+        // Delegate the ID parameter straight to our service layer reset mechanism!
+        return ResponseEntity.ok(jobService.retryDeadLetter(id));
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<Job> getById(@PathVariable UUID id){
         return ResponseEntity.ok(jobService.findById(id));
@@ -33,6 +42,8 @@ public class JobController {
     public ResponseEntity<Job> cancel(@PathVariable UUID id){
         return ResponseEntity.ok(jobService.cancel(id));
       //  return ResponseEntity.ok(cancel(id));
+
+
     }
 
 

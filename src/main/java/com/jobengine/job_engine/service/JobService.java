@@ -59,6 +59,32 @@ return existing.get();
                 .orElseThrow(()->new RuntimeException("Job record not found: "+ id));
    }
 
+    @Transactional
+    public Job retryDeadLetter(UUID id) {
+        // Line 1: Fetch the job out of the database table by its unique tracking ID
+        Job job = jobRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Job not found with ID: " + id));
+
+        // Line 2: Enforce a strict state machine boundary check rule
+        if (job.getStatus() != JobStatus.DEAD_LETTER) {
+            throw new RuntimeException(
+                    " Safety Violation: Only DEAD_LETTER jobs can be manually replayed. " +
+                            "Current status of this job is: " + job.getStatus());
+        }
+
+        // Line 3: Reset the system parameters completely for a clean slate start
+        job.setStatus(JobStatus.PENDING);       // Shifting back to the starting line
+        job.setAttempts(0);                     // Wiping the failure history counter
+        job.setErrorMessage(null);              // Clearing old error warning strings
+        job.setResultPayload(null);             // Purging the saved error stack trace
+        job.setNextRetryAt(null);               // Removing old scheduling delays
+        job.setLeaseExpiresAt(null);            // Stripping any leftover thread locks
+        job.setUpdatedAt(Instant.now());        // Recording the timestamp of this reset
+
+        // Line 4: Flush the clean new values back down onto the PostgreSQL disk
+        return jobRepository.save(job);
+    }
+
    @Transactional
     public Job cancel(UUID id){
 
@@ -76,6 +102,8 @@ return existing.get();
 
         log.info("Job {} successfully cancelled",id);
         return jobRepository.save(job);
+
+
    }
 
 }
